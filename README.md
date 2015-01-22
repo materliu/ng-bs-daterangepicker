@@ -51,10 +51,18 @@ angular.module('myApp', ['ngBootstrap']);
 and then just add an `input` of type `daterange`:
 
 ```
-<input type="daterange" ng-model="myDateRange">
+<input type="daterange" ng-model="data.myDateRange">
 ```
 
-The result object `$scope.myDateRange` has a `startDate` and `endDate` properties, which are instances of `moment()`.
+The result object `$scope.data.myDateRange` has a `startDate` and `endDate` properties, which are instances of `moment()`.
+
+Why we not directly use $scope.myDateRange, to understand this, we need to look at the way that AngularJS deals with inheritances of data values in scopes and how this is affected by the ng-model directive.
+
+When you read the value of a property that is defined directly on the scope, AngularJS checks to see whether there is a local property in the controller’s scope and, if not, starts working its way up the scope hierarchy to see whether it has inherited one. However, when you use the ng-model directive to modify such a property, AngularJS checks to see whether the scope has a property of the right name and, if not, assumes you want to implicitly define it. The effect is to override the property value.
+
+And sometimes we use <input type="daterange" ng-model="data.myDateRange"> insides ng-switch, ng-if directives, these directives creates new scope, if you use $scope.myDateRange as your ng-model, in such conditions your $scope.myDateRange will never be updated as your wish.
+
+Then how can $scope.data.myDateRange handle this? This is because JavaScript implements what is known as prototype inheritance—a topic so dry and confusing that I am not going to attempt to explain it here. To ensure that ng-bs-daterangepicker will work at any condition, then define your data properties via an object like $scope.data.myDateRange.
 
 ### Implemented features so far
 
@@ -85,7 +93,7 @@ The `limit` attribute lets you specify a number and unit similarly as you would 
 
 * `timePicker*`
 * `show*`
-* other formatting options like `*Class` and stuff 
+* other formatting options like `*Class` and stuff
 
 ### Build
 
